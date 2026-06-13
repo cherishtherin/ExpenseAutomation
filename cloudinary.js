@@ -1,13 +1,15 @@
 /**
- * Uploads an image (downloaded from Slack) to Cloudinary and returns a public URL.
+ * Uploads a file (downloaded from Slack) to Cloudinary and returns a public URL.
  * Uses Cloudinary's unsigned upload via REST API (no SDK needed).
  *
  * Requires env vars:
  *   CLOUDINARY_CLOUD_NAME
  *   CLOUDINARY_UPLOAD_PRESET (an "unsigned" upload preset created in Cloudinary settings)
+ *
+ * resourceType: "image" for images, "raw" for PDFs and other files
  */
 
-async function uploadToCloudinary(imageBuffer, filename = "receipt.jpg") {
+async function uploadToCloudinary(buffer, filename = "receipt.jpg", resourceType = "image") {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET;
 
@@ -15,10 +17,10 @@ async function uploadToCloudinary(imageBuffer, filename = "receipt.jpg") {
     throw new Error("Cloudinary env vars not configured");
   }
 
-  const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
 
   const form = new FormData();
-  form.append("file", new Blob([imageBuffer]), filename);
+  form.append("file", new Blob([buffer]), filename);
   form.append("upload_preset", uploadPreset);
 
   const res = await fetch(url, {

@@ -53,17 +53,26 @@ app.message(async ({ message, say, client }) => {
   }
 
   let receiptUrl;
+  let receiptFilename;
   if (hasFiles) {
     try {
       const file = message.files[0];
-      // Only handle images for now
-      if (file.mimetype && file.mimetype.startsWith("image/")) {
+      const mimetype = file.mimetype || "";
+
+      let resourceType = null;
+      if (mimetype.startsWith("image/")) {
+        resourceType = "image";
+      } else if (mimetype === "application/pdf") {
+        resourceType = "raw";
+      }
+
+      if (resourceType) {
         const buffer = await downloadSlackFile(file.url_private);
-        receiptUrl = await uploadToCloudinary(buffer, file.name || "receipt.jpg");
+        receiptFilename = file.name || (resourceType === "raw" ? "receipt.pdf" : "receipt.jpg");
+        receiptUrl = await uploadToCloudinary(buffer, receiptFilename, resourceType);
       }
     } catch (err) {
       console.error("Receipt upload failed:", err);
-      // Continue without receipt rather than failing the whole entry
     }
   }
 
@@ -73,6 +82,7 @@ app.message(async ({ message, say, client }) => {
       amount: parsed.amount,
       category: parsed.category,
       receiptUrl,
+      receiptFilename,
     });
 
     const receiptNote = hasFiles

@@ -5,9 +5,9 @@ const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
 /**
  * Create a new expense entry in Notion
- * @param {{ item: string, amount: number, category: string, receiptUrl?: string }} expense
+ * @param {{ item: string, amount: number, category: string, receiptUrl?: string, receiptFilename?: string }} expense
  */
-async function addExpense({ item, amount, category, receiptUrl }) {
+async function addExpense({ item, amount, category, receiptUrl, receiptFilename }) {
   const properties = {
     Item: {
       title: [{ text: { content: item } }],
@@ -25,7 +25,7 @@ async function addExpense({ item, amount, category, receiptUrl }) {
       files: [
         {
           type: "external",
-          name: "receipt.jpg",
+          name: receiptFilename || "receipt",
           external: { url: receiptUrl },
         },
       ],
