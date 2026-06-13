@@ -25,7 +25,7 @@ async function addExpense({ item, amount, category, receiptUrl }) {
       files: [
         {
           type: "external",
-          name: "receipt",
+          name: "receipt.jpg",
           external: { url: receiptUrl },
         },
       ],

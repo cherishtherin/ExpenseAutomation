@@ -7,7 +7,7 @@
  */
 
 const CATEGORY_RULES = [
-  { category: "Food", pattern: /\b(food|foods|meal|meals|lunch|dinner|breakfast|snack|snacks|coffee|restaurant|cafe|groceries|grocery)\b/i },
+  { category: "Food", pattern: /\b(food|foods|meal|meals|lunch|dinner|breakfast|snack|snacks|coffee|restaurant|cafe|groceries|grocery|bubble tea|boba|milk tea|tea|drink|drinks|juice)\b/i },
   { category: "Transport", pattern: /\b(grab|gojek|taxi|transport|bus|train|mrt|gas|fuel|uber|parking|toll)\b/i },
   { category: "Electronics", pattern: /\b(macbook|laptop|iphone|ipad|phone|electronics|charger|cable|gadget|monitor|keyboard|mouse|headphone|earbud|airpods?)\b/i },
   { category: "Bills", pattern: /\b(rent|electricity|water bill|wifi|internet|bill|bills|utilities|subscription)\b/i },
@@ -26,8 +26,6 @@ function tokenizeNumbers(text) {
   while ((match = regex.exec(text)) !== null) {
     const raw = match[0];
 
-    // Skip very short tokens (1 digit) directly attached to a preceding letter,
-    // e.g. the "5" in "m5"
     const precedingChar = text[match.index - 1];
     const isAttachedToLetter = precedingChar && /[a-zA-Z]/.test(precedingChar);
     const digitsOnly = raw.replace(/[^\d.]/g, "");
@@ -58,7 +56,6 @@ function extractItem(text, numberToken) {
     item = text.slice(0, numberToken.start) + " " + text.slice(numberToken.end);
   }
 
-  // Remove leftover currency words/symbols
   item = item.replace(/\b(nt|ntd|twd|usd|idr|rp|rupiah|dollars?|bucks?)\b/gi, " ");
   item = item.replace(/[$₩₱₪元]/g, " ");
 
@@ -90,8 +87,6 @@ function parseExpense(text) {
 
   const numbers = tokenizeNumbers(text);
 
-  // Pick the token with the most digits as the amount (the price).
-  // Tie-break: prefer the LAST occurrence (price usually comes after item name).
   let amountToken = null;
   for (const tok of numbers) {
     if (
