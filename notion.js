@@ -5,9 +5,10 @@ const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
 /**
  * Create a new expense entry in Notion
- * @param {{ item: string, amount: number, category: string, receiptUrl?: string, receiptFilename?: string }} expense
+ * @param {{ item: string, amount: number, category: string, date: string, receiptUrl?: string, receiptFilename?: string }} expense
+ *   date is an ISO date string "YYYY-MM-DD"
  */
-async function addExpense({ item, amount, category, receiptUrl, receiptFilename }) {
+async function addExpense({ item, amount, category, date, receiptUrl, receiptFilename }) {
   const properties = {
     Item: {
       title: [{ text: { content: item } }],
@@ -19,6 +20,12 @@ async function addExpense({ item, amount, category, receiptUrl, receiptFilename 
       select: { name: category },
     },
   };
+
+  if (date) {
+    properties.Date = {
+      date: { start: date },
+    };
+  }
 
   if (receiptUrl) {
     properties.Receipt = {

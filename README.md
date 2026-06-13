@@ -1,32 +1,37 @@
-# Expense Bot — Slack to Notion (v2: receipts included)
+# Expense Bot — Slack to Notion (v4: dates + new categories)
 
-## What's new in v2
-- Bubble tea / boba / milk tea / drinks → categorized as Food
-- Receipt photos: send an image with your message in Slack, and it gets
-  uploaded to Cloudinary and embedded in Notion's "Receipt" file property
+## What's new in v4
 
-## New setup step: Cloudinary (free)
+### Date parsing
+Messages can include a date in many formats:
+- "french class 3700 in january" → Jan 1 of current year
+- "french class 3700 jan 23" / "23 jan" → Jan 23 of current year
+- "french class 3700 jan 23 2025" / "23 jan 2025" → Jan 23, 2025
+- No date mentioned → defaults to today's date
 
-1. Sign up at cloudinary.com (free tier: 25GB storage, no card needed)
-2. On your dashboard, copy your **Cloud Name**
-3. Go to Settings → Upload → scroll to "Upload presets" → click "Add upload preset"
-   - Set **Signing Mode** to **Unsigned**
-   - Save, then copy the **preset name**
-4. Add to Render environment variables:
-   - `CLOUDINARY_CLOUD_NAME`
-   - `CLOUDINARY_UPLOAD_PRESET`
+### Updated categories
+- **Food & Drinks** (was "Food") — includes bubble tea, boba, drinks etc.
+- **Education** — class, course, tuition, lesson, book, school, workshop, exam, etc.
+- **Leisure** — netflix, cinema, movie, spotify, game, concert, etc.
+- **Transport** — unchanged
+- **Bills** — unchanged
+- **Health** — unchanged
+- **Other** — fallback (note: "macbook m5 39000" now falls into Other since
+  the old "Electronics" category was removed per the new spec — let me know
+  if you want Electronics back as its own category)
 
-## Slack setup change
+## Notion setup change
 
-Add this Bot Token Scope (in addition to existing ones):
-- `files:read`
+Add a new property to your database:
+- **Date** — type **Date**
 
-Then reinstall the app to your workspace (Slack will prompt you).
+## All other setup
 
-## Usage
+Same as v3 (Slack scopes, Cloudinary, Render env vars) — no new env vars needed.
 
-- Text only: `lunch 250` → logs without receipt
-- Text + photo: type `lunch 250` as the message AND attach a photo in the
-  same message → logs with receipt image embedded in Notion
+## Known limitation
 
-All other setup steps are the same as v1 (see previous README).
+"Month + year only" (no day), e.g. "spotify 150 dec 2024", isn't fully
+supported — amount parsing works correctly, but the date may not register
+as December 2024 exactly. This format wasn't in the original spec
+(day+month, month+day, or month-only formats are supported).

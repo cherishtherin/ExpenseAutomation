@@ -81,6 +81,7 @@ app.message(async ({ message, say, client }) => {
       item: parsed.item,
       amount: parsed.amount,
       category: parsed.category,
+      date: parsed.date,
       receiptUrl,
       receiptFilename,
     });
@@ -92,7 +93,7 @@ app.message(async ({ message, say, client }) => {
       : "";
 
     await say({
-      text: `✅ Logged: *${parsed.item}* — ${parsed.amount} (${parsed.category})${receiptNote}`,
+      text: `✅ Logged: *${parsed.item}* — ${parsed.amount} (${parsed.category}) on ${parsed.date}${receiptNote}`,
       thread_ts: message.ts,
     });
   } catch (err) {
